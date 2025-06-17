@@ -1,0 +1,156 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Deployment & CI/CD Pipeline
+
+## GitHub Actions Workflows
+
+### PWA Build & Deploy Workflow
+Location: `.github/workflows/deploy-pwa.yml`
+
+```yaml
+name: Deploy PWA to GitHub Pages
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'pwa/**' ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: |
+          cd pwa
+          npm ci
+          npm run build
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./pwa/dist
+```
+
+### Agent Build & Release Workflow  
+Location: `.github/workflows/release-agent.yml`
+
+```yaml
+name: Build Agent & Create Release
+on:
+  push:
+    tags: [ 'v*' ]
+    paths: [ 'agent/**' ]
+
+jobs:
+  build-agent:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: |
+          cd agent
+          npm ci
+          npm run build
+          npx pkg . --targets node18-win-x64
+      - name: Build NSIS Installer
+        run: |
+          cd agent/installer
+          makensis installer.nsi
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            agent/agent.exe
+            agent/installer/InfoBot-Setup.exe
+```
+
+## GitHub Pages Configuration
+
+### Repository Settings
+- **Source**: Deploy from `gh-pages` branch
+- **Custom Domain**: Optional (e.g., `tool.firma.de`)
+- **HTTPS**: Enforce HTTPS (required for PWA)
+
+### Branch Strategy
+```
+main (protected)
+├── pwa/          # PWA source code
+├── agent/        # Agent source code
+└── docs/         # Documentation
+
+gh-pages (auto-generated)
+└── PWA build artifacts
+```
+
+## Release Process
+
+### Version Management
+- **Semantic Versioning**: `v1.0.0`, `v1.0.1`, etc.
+- **PWA Versions**: Automatic from package.json
+- **Agent Versions**: Tagged releases trigger builds
+
+### Release Checklist
+1. **Code Review**: All changes reviewed and approved
+2. **Testing**: Local testing of PWA + Agent integration
+3. **Version Bump**: Update package.json versions
+4. **Tag Creation**: Create git tag for agent releases
+5. **Release Notes**: Document changes and installation instructions
+
+### Deployment Verification
+```typescript
+// Health check after deployment
+const verifyDeployment = async () => {
+  // PWA accessibility check
+  const pwaResponse = await fetch('https://your-domain.github.io');
+  
+  // Service Worker registration check
+  const swRegistered = 'serviceWorker' in navigator;
+  
+  // Manifest validation
+  const manifest = await fetch('/manifest.json');
+};
+```
+
+## Environment Configuration
+
+### Development Environment
+```bash
+# Local development setup
+cd pwa && npm run dev    # PWA on http://localhost:5173
+cd agent && npm run dev  # Agent on http://127.0.0.1:3210
+```
+
+### Production Environment
+- **PWA**: GitHub Pages (HTTPS)
+- **Agent**: Local Windows service (HTTP)
+- **CORS**: Configured for production domain
+
+## Monitoring & Rollback
+
+### Deployment Monitoring
+- **GitHub Pages**: Monitor deployment status
+- **PWA Metrics**: Service Worker update success rate
+- **Agent Distribution**: Release download statistics
+
+### Rollback Strategy
+```bash
+# PWA rollback (revert gh-pages branch)
+git checkout gh-pages
+git revert <commit-hash>
+git push origin gh-pages
+
+# Agent rollback (previous installer version)
+# Users download and install previous release
+```
+
+## Security Considerations
+- **Secrets Management**: Use GitHub Secrets for tokens
+- **Dependency Scanning**: Automated vulnerability checks
+- **Code Signing**: Optional for agent executable
+- **HTTPS Enforcement**: Required for PWA functionality
+

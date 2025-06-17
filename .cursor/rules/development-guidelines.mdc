@@ -1,0 +1,59 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Development Guidelines for InfoBot PWA
+
+## Code Style & Structure
+- Write concise, technical TypeScript code
+- Use functional and declarative programming patterns; avoid classes
+- Prefer iteration and modularization over code duplication
+- Use descriptive variable names (e.g. `isLoadingScript`, `hasExecutionError`)
+- Follow strict TypeScript mode in `tsconfig.json`
+
+## Naming Conventions
+- Use **kebab-case** for directory names (e.g. `src/components/script-runner`)
+- Prefer **named exports** for components and modules
+- Use **PascalCase** for React components
+- Use **camelCase** for functions and variables
+
+## TypeScript Usage
+- Use TypeScript for all code
+- Prefer **Interfaces** over `type` aliases for object structures and props
+- **Avoid `enum`s** - use objects or string/number literal types instead
+- Use functional components with TypeScript interfaces for props
+- Enable and follow **strict mode** in TypeScript
+
+## Project Structure
+```
+pwa/
+├── src/
+│   ├── components/          # React components
+│   ├── services/           # API clients and utilities
+│   ├── hooks/             # Custom React hooks
+│   ├── types/             # TypeScript type definitions
+│   └── utils/             # Helper functions
+└── public/                # Static assets and PWA manifest
+
+agent/
+├── src/
+│   ├── server.ts          # Express server
+│   ├── services/          # Business logic
+│   └── utils/             # Helper functions
+└── installer/             # NSIS installer files
+```
+
+## Error Handling
+- Implement robust error handling for API calls and script execution
+- Use "Early Return" pattern for error checks
+- Provide user-friendly German error messages
+- Implement proper logging with winston for the agent
+- Use Error Boundaries as fallback in React components
+
+## Performance Guidelines
+- Use `React.memo`, `useMemo`, `useCallback` thoughtfully to avoid unnecessary re-renders
+- Optimize images and assets for PWA
+- Implement proper Service Worker caching strategies
+- Use lazy loading where appropriate
+

@@ -1,0 +1,28 @@
+{
+  "name": "infobot",
+  "version": "1.0.0",
+  "description": "Progressive Web App for secure script execution with local agent service",
+  "private": true,
+  "workspaces": [
+    "pwa",
+    "agent"
+  ],
+  "scripts": {
+    "dev:pwa": "cd pwa && npm run dev",
+    "dev:agent": "cd agent && npm run dev",
+    "build:pwa": "cd pwa && npm run build",
+    "build:agent": "cd agent && npm run build",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.1.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 

@@ -1,0 +1,94 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# API Architecture & Agent Communication
+
+## Agent REST API Endpoints
+
+### Core Endpoints
+The agent service runs on `127.0.0.1:3210` and provides these endpoints:
+
+#### `POST /run` - Execute Script
+- **Purpose**: Execute the predefined PowerShell/Batch script
+- **Authentication**: Requires `X-Agent-Token` header
+- **Response**: 
+  ```typescript
+  interface ScriptResult {
+    exitCode: number;
+    stdout: string;
+    stderr: string;
+    durationMs: number;
+  }
+  ```
+
+#### `GET /version` - Agent Version
+- **Purpose**: Get current agent version for health checks
+- **Authentication**: None required
+- **Response**: `{ version: string }`
+
+#### `GET /token` - Get Authentication Token
+- **Purpose**: Retrieve the authentication token for PWA storage
+- **Authentication**: None required (localhost only)
+- **Response**: `{ token: string }`
+
+#### `GET /health` - Health Check
+- **Purpose**: Verify agent is running and responsive
+- **Authentication**: None required
+- **Response**: `{ status: "ok", timestamp: number }`
+
+## Security Implementation
+
+### Token Management
+- 256-bit random token generated during installation
+- Stored in `%ProgramData%\Tool\token.txt`
+- Validated on every `/run` request
+- Returns HTTP 401 for invalid tokens
+
+### CORS Configuration
+```typescript
+// Only allow requests from the deployed PWA
+app.use(cors({
+  origin: 'https://your-github-pages-url.github.io',
+  credentials: true
+}));
+```
+
+### Request Validation
+```typescript
+interface AgentRequest {
+  headers: {
+    'X-Agent-Token': string;
+    'Content-Type': 'application/json';
+  };
+}
+```
+
+## PWA API Client Implementation
+
+### Service Structure
+```typescript
+class AgentApiClient {
+  private baseUrl = 'http://127.0.0.1:3210';
+  private token: string | null = null;
+
+  async runScript(): Promise<ScriptResult>;
+  async getVersion(): Promise<string>;
+  async getToken(): Promise<string>;
+  async healthCheck(): Promise<boolean>;
+}
+```
+
+### Error Handling Patterns
+- **Agent Offline**: Show setup instructions modal
+- **Invalid Token**: Attempt token refresh, then show error
+- **Script Execution Error**: Display stderr with user-friendly message
+- **Network Timeout**: Retry logic with exponential backoff
+
+## Implementation Priority
+1. **Health Check** - Verify agent connectivity
+2. **Token Management** - Secure authentication flow  
+3. **Script Execution** - Core functionality
+4. **Error Handling** - Graceful failure modes
+

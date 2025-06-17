@@ -1,0 +1,100 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# PWA Requirements & Implementation
+
+## PWA Core Features
+
+### Service Worker Implementation
+- **Caching Strategy**: Offline-first for app shell, network-first for API calls
+- **Update Mechanism**: Automatic updates with user notification
+- **Offline Functionality**: Show offline status when agent is unreachable
+
+```typescript
+// Service Worker registration
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+```
+
+### Web App Manifest
+Required manifest.json properties:
+```json
+{
+  "name": "InfoBot Script Runner",
+  "short_name": "InfoBot",
+  "description": "Execute scripts with one click",
+  "display": "standalone",
+  "start_url": "/",
+  "theme_color": "#1976d2",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+```
+
+### Installability Features
+- **Install Prompt**: Handle `beforeinstallprompt` event
+- **Standalone Detection**: Detect when running as installed PWA
+- **Update Notifications**: Notify users when new version is available
+
+## User Experience Requirements
+
+### German Language
+- All user-facing text must be in German
+- Error messages translated from technical errors
+- Installation instructions in German
+
+### UI/UX Guidelines
+- **Single-Click Execution**: Primary action should be one click
+- **Clear Status Indicators**: Show script execution progress
+- **Error Handling**: Modal dialogs for setup instructions
+- **Success Feedback**: Toast notifications for successful execution
+
+### Responsive Design
+- **Desktop-First**: Primary target is Windows desktop browsers
+- **Minimum Resolution**: Support 1024x768 and above
+- **Touch-Friendly**: Buttons should be touch-accessible
+
+## Performance Requirements
+
+### Loading Performance
+- **First Contentful Paint**: < 1.5 seconds
+- **Time to Interactive**: < 2 seconds
+- **Script Execution**: < 1 second after button click
+
+### Caching Strategy
+```typescript
+// Workbox configuration example
+workbox.routing.registerRoute(
+  /^https:\/\/127\.0\.0\.1:3210\//,
+  new workbox.strategies.NetworkFirst({
+    cacheName: 'agent-api',
+    networkTimeoutSeconds: 3
+  })
+);
+```
+
+## Security Considerations
+- **HTTPS Requirement**: PWA must be served over HTTPS (GitHub Pages)
+- **Mixed Content**: Handle HTTP agent calls from HTTPS PWA
+- **Token Storage**: Secure local storage of authentication token
+- **CSP Headers**: Implement Content Security Policy
+
+## Browser Compatibility
+- **Primary**: Chrome 90+, Edge 90+
+- **Secondary**: Firefox 88+
+- **Not Supported**: Internet Explorer, Safari (due to localhost HTTP restrictions)
+

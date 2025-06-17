@@ -1,0 +1,38 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# InfoBot PWA Project Overview
+
+## Project Description
+InfoBot is a Progressive Web App (PWA) that enables up to 5 internal Windows users to execute predefined scripts (Batch/PowerShell) on their local PCs with a single click. The PWA is deployed via **GitHub Pages** and communicates with a local **Agent Service** running on 127.0.0.1.
+
+## Key Project Documents
+- [PWA_PRD.md](mdc:PWA_PRD.md) - Complete Product Requirements Document
+- [IMPLEMENTIERUNG_AKTIONSPLAN.md](mdc:IMPLEMENTIERUNG_AKTIONSPLAN.md) - Detailed implementation plan and architecture
+- [GITHUB_PAGES_SETUP.md](mdc:GITHUB_PAGES_SETUP.md) - GitHub Pages deployment guide
+
+## Architecture Overview
+```
+Browser (PWA, HTTPS) ───▶ 127.0.0.1:3210 (HTTP) ───▶ Script.ps1/BAT
+```
+
+## Technology Stack
+- **Frontend**: TypeScript, React 18, Vite, Workbox (Service Worker)
+- **Agent**: Node.js 18, Express 4, winston Logger, node-windows
+- **Deployment**: GitHub Pages, GitHub Actions CI/CD
+- **Installer**: NSIS 3.x for Windows service installation
+
+## Project Goals
+1. **Zero hosting costs** - GitHub Pages deployment
+2. **Secure local execution** - Token-based authentication
+3. **Simple installation** - ≤ 10 minutes setup per PC
+4. **High reliability** - ≥ 99% successful script executions
+
+## Security Model
+- Agent listens only on `127.0.0.1:3210`
+- Token-based authentication (256-bit random token)
+- CORS restricted to specific origin
+- No external data transmission
+

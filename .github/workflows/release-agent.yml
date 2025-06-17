@@ -1,0 +1,51 @@
+name: Build Agent & Create Release
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+jobs:
+  build-agent:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          cd agent
+          npm ci
+          
+      - name: Build Agent Executable
+        run: |
+          cd agent
+          npm run build:exe
+          
+      - name: Setup NSIS
+        uses: joncloud/makensis-action@v4
+        
+      - name: Build Installer
+        run: |
+          cd agent/installer
+          makensis installer.nsi
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            agent/dist/agent.exe
+            agent/installer/InfoBot-Setup.exe
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
