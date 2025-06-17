@@ -66,7 +66,7 @@ export default defineConfig({
       '@/utils': path.resolve(__dirname, './src/utils')
     }
   },
-  base: '/InfoBot/',
+  base: '/InfoBot1/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
