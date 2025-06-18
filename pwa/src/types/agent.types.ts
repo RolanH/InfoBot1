@@ -31,12 +31,12 @@ export interface AgentStatus {
   isConnected: boolean;
   lastPing?: number;
   version?: string;
-  error?: string;
+  error?: string | undefined;
 }
 
 export interface ScriptExecutionState {
   isExecuting: boolean;
-  result?: ScriptResult;
-  error?: ApiError;
-  startTime?: number;
+  result?: ScriptResult | undefined;
+  error?: ApiError | undefined;
+  startTime?: number | undefined;
 } 

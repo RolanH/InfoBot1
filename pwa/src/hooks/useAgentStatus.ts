@@ -15,7 +15,7 @@ export function useAgentStatus() {
     setIsChecking(true);
     
     try {
-      const health = await agentApi.healthCheck();
+      await agentApi.healthCheck();
       const version = await agentApi.getVersion();
       
       setStatus({

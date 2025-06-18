@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAgentStatus } from '@/hooks/useAgentStatus';
 import { useScriptRunner } from '@/hooks/useScriptRunner';
 
